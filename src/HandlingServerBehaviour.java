@@ -52,6 +52,7 @@ public class HandlingServerBehaviour extends CyclicBehaviour
                     msgStringBuilder.append(currentX);
                     msgStringBuilder.append(":");
                     msgStringBuilder.append(currentY);
+                    reply.setContent(msgStringBuilder.toString());
                     myAgent.send(reply);
                 }
                 else

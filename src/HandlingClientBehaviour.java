@@ -46,6 +46,7 @@ public class HandlingClientBehaviour extends CyclicBehaviour
             {
                 if((currentY == arrayC[0].length - 1) && (currentX == arrayC.length - 1)) //ALL ELEMENTS?
                 {
+                    System.out.println("-----");
                     //CHECKING PROGRESS ARRAY
                     outerLoop:
                     for(int i = 0; i < progressArray.length; i++)
@@ -56,33 +57,39 @@ public class HandlingClientBehaviour extends CyclicBehaviour
                             if(progressArray[i][j] != 2)
                             {
                                 numberOfFails++;
+                                System.out.println("WYKRYLEM FAILA: " + j + i);
 
                                 ACLMessage reply = msg.createReply();
                                 reply.setPerformative(ACLMessage.REQUEST);
 
                                 //rows and columns
-                                for (int k = 0; i < arrayA[0].length; k++) {
+                                for (int k = 0; k < arrayA[0].length; k++) {
                                     rowsStringBuilder.append((arrayA[j][k]));
                                     if (k != arrayA[0].length - 1) {
                                         rowsStringBuilder.append(",");
                                     }
 
                                 }
+                                System.out.print("ROWS: ");
+                                System.out.println(rowsStringBuilder);
 
-                                for (int k = 0; i < arrayB.length; k++) {
+                                for (int k = 0; k < arrayB.length; k++) {
                                     columnsStringBuilder.append(arrayB[k][i]);
                                     if (k != arrayB.length - 1)
                                         columnsStringBuilder.append(",");
                                 }
+                                System.out.print("COLUMNS: ");
+                                System.out.println(columnsStringBuilder);
                                 //Create msg
-                                msgStringBuilder.append(i);
-                                msgStringBuilder.append(":");
                                 msgStringBuilder.append(j);
+                                msgStringBuilder.append(":");
+                                msgStringBuilder.append(i);
                                 msgStringBuilder.append(":");
                                 msgStringBuilder.append(rowsStringBuilder);
                                 msgStringBuilder.append(":");
                                 reply.setContent(msgStringBuilder.append(columnsStringBuilder).toString());
                                 myAgent.send(reply);
+                                msgStringBuilder.delete(0,msgStringBuilder.length());
                                 rowsStringBuilder.delete(0,rowsStringBuilder.length());
                                 columnsStringBuilder.delete(0,columnsStringBuilder.length());
                                 break outerLoop;
@@ -165,10 +172,10 @@ public class HandlingClientBehaviour extends CyclicBehaviour
             else if(msg.getPerformative() == ACLMessage.FAILURE)
             {
                 System.out.println("Serwer odebral FAILA " + msg.getContent());
-                String[] partsMessage = msg.getContent().split(":");
-                int tempX = Integer.parseInt(partsMessage[0]);
-                int tempY= Integer.parseInt(partsMessage[1]);
-                progressArray[tempY][tempX] = 0;
+//                String[] partsMessage = msg.getContent().split(":");
+//                int tempX = Integer.parseInt(partsMessage[0]);
+//                int tempY= Integer.parseInt(partsMessage[1]);
+//                progressArray[tempY][tempX] = 0;
             }
         }
         else

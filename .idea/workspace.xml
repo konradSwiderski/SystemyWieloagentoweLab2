@@ -27,8 +27,8 @@
       <file leaf-file-name="HandlingClientBehaviour.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/HandlingClientBehaviour.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="196">
-              <caret line="151" column="32" lean-forward="true" selection-start-line="151" selection-start-column="32" selection-end-line="151" selection-end-column="32" />
+            <state relative-caret-position="653">
+              <caret line="95" column="29" lean-forward="true" selection-start-line="95" selection-start-column="29" selection-end-line="95" selection-end-column="29" />
               <folding />
             </state>
           </provider>
@@ -37,8 +37,8 @@
       <file leaf-file-name="HandlingServerBehaviour.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/HandlingServerBehaviour.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="94">
-              <caret line="37" column="61" lean-forward="true" selection-start-line="34" selection-start-column="16" selection-end-line="37" selection-end-column="61" />
+            <state relative-caret-position="298">
+              <caret line="46" column="38" lean-forward="false" selection-start-line="46" selection-start-column="38" selection-end-line="46" selection-end-column="38" />
               <folding>
                 <element signature="e#399#408#0" expanded="true" />
                 <element signature="e#455#464#0" expanded="true" />
@@ -116,8 +116,8 @@
         <option value="$PROJECT_DIR$/src/OutputContainer.java" />
         <option value="$PROJECT_DIR$/src/DistributorAgent.java" />
         <option value="$PROJECT_DIR$/src/CountingAgent.java" />
-        <option value="$PROJECT_DIR$/src/HandlingServerBehaviour.java" />
         <option value="$PROJECT_DIR$/src/HandlingClientBehaviour.java" />
+        <option value="$PROJECT_DIR$/src/HandlingServerBehaviour.java" />
       </list>
     </option>
   </component>
@@ -544,8 +544,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/HandlingServerBehaviour.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="94">
-          <caret line="37" column="61" lean-forward="true" selection-start-line="34" selection-start-column="16" selection-end-line="37" selection-end-column="61" />
+        <state relative-caret-position="298">
+          <caret line="46" column="38" lean-forward="false" selection-start-line="46" selection-start-column="38" selection-end-line="46" selection-end-column="38" />
           <folding>
             <element signature="e#399#408#0" expanded="true" />
             <element signature="e#455#464#0" expanded="true" />
@@ -555,8 +555,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/HandlingClientBehaviour.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="196">
-          <caret line="151" column="32" lean-forward="true" selection-start-line="151" selection-start-column="32" selection-end-line="151" selection-end-column="32" />
+        <state relative-caret-position="653">
+          <caret line="95" column="29" lean-forward="true" selection-start-line="95" selection-start-column="29" selection-end-line="95" selection-end-column="29" />
           <folding />
         </state>
       </provider>
