@@ -10,8 +10,12 @@ public class HandlingClientBehaviour extends CyclicBehaviour
     private int[][] progressArray;
     private String rows = "";
     private String columns = "";
+    private StringBuilder rowsStringBuilder = new StringBuilder("");
+    private StringBuilder columnsStringBuilder = new StringBuilder("");
+    private StringBuilder msgStringBuilder = new StringBuilder("");
     private int currentY = 0;
     private int currentX = -1;
+    private int numberOfFails = 0;
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -35,76 +39,137 @@ public class HandlingClientBehaviour extends CyclicBehaviour
 
     public void action()
     {
-        ACLMessage msg = myAgent.receive(MessageTemplate.MatchPerformative(ACLMessage.REQUEST)); //set pattern and filter to request
+        ACLMessage msg = myAgent.receive();
         if (msg!= null)
         {
-            System.out.println("Serwer odebral " + msg.getContent());
-            if(msg.getContent().contains(":"))
+            if(msg.getPerformative() == ACLMessage.REQUEST) //Client is ready
+            {
+                if((currentY == arrayC[0].length - 1) && (currentX == arrayC.length - 1)) //ALL ELEMENTS?
+                {
+                    //CHECKING PROGRESS ARRAY
+                    outerLoop:
+                    for(int i = 0; i < progressArray.length; i++)
+                    {
+                        for(int j = 0; j < progressArray.length; j++)
+                        {
+                            System.out.print(progressArray[i][j] + " ");
+                            if(progressArray[i][j] != 2)
+                            {
+                                numberOfFails++;
+
+                                ACLMessage reply = msg.createReply();
+                                reply.setPerformative(ACLMessage.REQUEST);
+
+                                //rows and columns
+                                for (int k = 0; i < arrayA[0].length; k++) {
+                                    rowsStringBuilder.append((arrayA[j][k]));
+                                    if (k != arrayA[0].length - 1) {
+                                        rowsStringBuilder.append(",");
+                                    }
+
+                                }
+
+                                for (int k = 0; i < arrayB.length; k++) {
+                                    columnsStringBuilder.append(arrayB[k][i]);
+                                    if (k != arrayB.length - 1)
+                                        columnsStringBuilder.append(",");
+                                }
+                                //Create msg
+                                msgStringBuilder.append(i);
+                                msgStringBuilder.append(":");
+                                msgStringBuilder.append(j);
+                                msgStringBuilder.append(":");
+                                msgStringBuilder.append(rowsStringBuilder);
+                                msgStringBuilder.append(":");
+                                reply.setContent(msgStringBuilder.append(columnsStringBuilder).toString());
+                                myAgent.send(reply);
+                                rowsStringBuilder.delete(0,rowsStringBuilder.length());
+                                columnsStringBuilder.delete(0,columnsStringBuilder.length());
+                                break outerLoop;
+                            }
+                        }
+                        System.out.println();
+                    }
+                    if(numberOfFails == 0)
+                    {
+                        ACLMessage reply = msg.createReply();
+                        reply.setPerformative(ACLMessage.CANCEL);
+                        myAgent.send(reply);
+
+                        for(int i = 0; i < arrayC.length; i++)
+                        {
+                            for(int j = 0; j < arrayC[0].length; j++)
+                            {
+                                System.out.print(arrayC[i][j]);
+                                System.out.print(" ");
+                            }
+                            System.out.println();
+                        }
+                        System.out.println("the end");
+                    }
+
+                    //reset
+                    numberOfFails = 0;
+                }
+                else {
+                    if (currentX < arrayC.length - 1) {
+                        currentX++;
+                    } else {
+                        currentX = 0;
+                        currentY++;
+                    }
+
+
+                    for (int i = 0; i < arrayA[0].length; i++) {
+                        rowsStringBuilder.append((arrayA[currentY][i]));
+                        if (i != arrayA[0].length - 1) {
+                            rowsStringBuilder.append(",");
+                        }
+
+                    }
+
+                    for (int i = 0; i < arrayB.length; i++) {
+                        columnsStringBuilder.append(arrayB[i][currentX]);
+                        if (i != arrayB.length - 1)
+                            columnsStringBuilder.append(",");
+                    }
+
+                    ACLMessage reply = msg.createReply();
+                    reply.setPerformative(ACLMessage.REQUEST);
+                    msgStringBuilder.append(currentX);
+                    msgStringBuilder.append(":");
+                    msgStringBuilder.append(currentY);
+                    msgStringBuilder.append(":");
+                    msgStringBuilder.append(rowsStringBuilder);
+                    msgStringBuilder.append(":");
+                    reply.setContent(msgStringBuilder.append(columnsStringBuilder).toString());
+                    myAgent.send(reply);
+                    //State 1 = send to client
+                    progressArray[currentY][currentX] = 1;
+
+                    //Clear
+                    rowsStringBuilder.delete(0, rowsStringBuilder.length());
+                    columnsStringBuilder.delete(0, columnsStringBuilder.length());
+                    msgStringBuilder.delete(0, msgStringBuilder.length());
+                }
+            }
+            else if(msg.getPerformative() == ACLMessage.CONFIRM) //Get value of ArrayC
             {
                 String[] partsMessage = msg.getContent().split(":");
-                System.out.println("!!!!!!!!!!" + partsMessage[0]);
                 int tempX = Integer.parseInt(partsMessage[0]);
                 int tempY = Integer.parseInt(partsMessage[1]);
                 arrayC[tempY][tempX] = Integer.parseInt(partsMessage[2]);
+                //State 2 = get value from client
+                progressArray[tempY][tempX] = 2;
             }
-            if((currentY == arrayC[0].length - 1) && (currentX == arrayC.length - 1))
+            else if(msg.getPerformative() == ACLMessage.FAILURE)
             {
-                for(int i = 0; i < arrayC.length; i++)
-                {
-                    for(int j = 0; j < arrayC[0].length; j++)
-                    {
-                        System.out.print(arrayC[i][j]);
-                        System.out.print(" ");
-                    }
-                System.out.println();
-                }
-                System.out.println("the end");
+                System.out.println("Serwer odebral FAILA " + msg.getContent());
+                String[] partsMessage = msg.getContent().split(":");
+                int tempX = Integer.parseInt(partsMessage[0]);
+                int tempY= Integer.parseInt(partsMessage[1]);
+                progressArray[tempY][tempX] = 0;
             }
-            else
-            {
-                if (currentX < arrayC.length - 1)
-                {
-                    currentX++;
-                } else {
-                    currentX = 0;
-                    currentY++;
-                }
-
-            }
-
-            System.out.println("----");
-            System.out.println(currentX);//in tab this is SECOND Coordiante
-            System.out.println(currentY);//in tab this is FIRST Coordinate
-
-            for(int i = 0; i < arrayA[0].length; i++) {
-                if(i == arrayA[0].length - 1)
-                {
-                    rows = rows + Integer.toString(arrayA[currentY][i]);
-                }
-                else
-                {
-                    rows = rows + Integer.toString(arrayA[currentY][i]) + ",";
-                }
-                }
-
-            for(int i = 0; i < arrayB.length; i++) {
-                if(i == arrayB.length - 1)
-                {
-                    columns = columns + Integer.toString(arrayB[i][currentX]);
-                }
-                else
-                {
-                    columns = columns + Integer.toString(arrayB[i][currentX]) + ",";
-                }
-            }
-
-
-            ACLMessage reply = msg.createReply();
-            reply.setPerformative(ACLMessage.REQUEST);
-            reply.setContent(currentX + ":" + currentY + ":" + rows + ":" + columns);
-            myAgent.send(reply);
-            rows = "";
-            columns = "";
         }
         else
         {

@@ -19,8 +19,8 @@ public class DistributorAgent extends Agent
         DFAgentDescription dfd = new DFAgentDescription();
         dfd.setName(getAID());
         ServiceDescription sd = new ServiceDescription();
-        sd.setType("generator_of_tokens");
-        sd.setName("serverAgent");
+        sd.setType("Arrays");
+        sd.setName("DistributorAgent");
         dfd.addServices(sd);
         try
         {

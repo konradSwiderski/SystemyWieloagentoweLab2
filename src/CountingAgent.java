@@ -35,8 +35,8 @@ public class CountingAgent extends Agent{
     {
         DFAgentDescription template = new DFAgentDescription();
         ServiceDescription sd = new ServiceDescription();
-        sd.setType("generator_of_tokens");
-        sd.setName("serverAgent");
+        sd.setType("Arrays");
+        sd.setName("DistributorAgent");
         template.addServices(sd);
         try
         {
