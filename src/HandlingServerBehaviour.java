@@ -31,7 +31,7 @@ public class HandlingServerBehaviour extends CyclicBehaviour
     {
         System.out.println("....................." + myAgent.getName());
         agentName = myAgent.getName();
-        if(agentName.contains("agent6"))
+        if(myAgent.getClass().toString().equals("class MaliciousAgent"))
         {
             System.out.println("Jestem ten zly");
             maliciousAgent = true;

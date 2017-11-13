@@ -78,7 +78,8 @@ public class HandlingClientBehaviour extends CyclicBehaviour
             }
             else
             {
-                System.out.println("MY NAME IS: " + msg.getSender() + "++++++++++++++++++++++++++++++++Nie masz prawa agencie");
+                System.out.println("MY NAME IS: " + msg.getSender() + "++++++++++++++++++++++++++++++++Nie masz prawa agencie Twoja wartosc" + msg.getContent());
+
 //                ACLMessage reply = msg.createReply();
 //                reply.setPerformative(ACLMessage.CANCEL);
 //                myAgent.send(reply);
@@ -166,7 +167,8 @@ public class HandlingClientBehaviour extends CyclicBehaviour
                     //reset
                     numberOfFails = 0;
                 }
-                else {
+                else if (!bannedVectorOfAgents.contains(msg.getSender()))
+                {
                     if (currentX < arrayC.length - 1) {
                         currentX++;
                     } else {
@@ -215,7 +217,7 @@ public class HandlingClientBehaviour extends CyclicBehaviour
                 int tempY = Integer.parseInt(partsMessage[1]);
                 //weryfikacja////////////////////////////////////////////////////////////////////////////////////////////////////
                 isVerification++;
-                if((isVerification % 3) == 0)
+                if((isVerification % 3) == 0 && !bannedVectorOfAgents.contains(msg.getSender()))
                 {
                     agentVerification = msg.getSender();
 
@@ -270,10 +272,15 @@ public class HandlingClientBehaviour extends CyclicBehaviour
 
                     valueToVerification = Integer.parseInt(partsMessage[2]);
                 }
-                else
+                else if(!bannedVectorOfAgents.contains(msg.getSender()))
                 {
+                    System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!Wstawiam wartosc bez weryfikacji " + Integer.parseInt(partsMessage[2]));
                     arrayC[tempY][tempX] = Integer.parseInt(partsMessage[2]);
                     progressArray[tempY][tempX] = 2; //State 2 = get value from client
+                }
+                else
+                {
+                    System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!NIE Wstawiam wartosc bez weryfikacji " + Integer.parseInt(partsMessage[2]));
                 }
 
             }
@@ -284,7 +291,7 @@ public class HandlingClientBehaviour extends CyclicBehaviour
                 int tempX = Integer.parseInt(partsMessage[0]);
                 int tempY= Integer.parseInt(partsMessage[1]);
 
-//                progressArray[tempY][tempX] = 0;
+                progressArray[tempY][tempX] = -1;
                 System.out.print(">>>>>>>>>>>>>>>>>>>>>>>>>>.");
                 System.out.println(arrayB[tempX][tempY]);
             }
@@ -298,6 +305,7 @@ public class HandlingClientBehaviour extends CyclicBehaviour
                 if(valueToVerification == Integer.parseInt(partsMessage[2]))
                 {
                     System.out.println(")))))))))))))))))Weryfikacja przeprowdzona: ZGODA");
+//                    arrayC[tempY][tempX] = Integer.parseInt(partsMessage[2]);
                     arrayC[tempY][tempX] = Integer.parseInt(partsMessage[2]);
                     progressArray[tempY][tempX] = 2; //State 2 = get value from client
                 }
@@ -359,24 +367,25 @@ public class HandlingClientBehaviour extends CyclicBehaviour
             }
             else if(msg.getPerformative() == ACLMessage.ACCEPT_PROPOSAL) //agentJudge
             {
-                String[] partsMessage = msg.getContent().split(":");
-                int tempX = Integer.parseInt(partsMessage[0]);
-                int tempY = Integer.parseInt(partsMessage[1]);
-                System.out.println("SERWER ACCEPT_PROPOSAL: " + myAgent.getName() + " X " + currentX + " Y " + currentY + " = " + Integer.parseInt(partsMessage[2]));
-                valueFromAgentJudge = Integer.parseInt(partsMessage[2]);
-                if(valueFromAgentJudge == valueToVerification)
-                {
-                    System.out.println("))))))))))))SERWER MOWI: KLAMCA JEST " +  agentTester);
-                    bannedVectorOfAgents.addElement(agentTester);
-                    vectorOfAgents.remove(agentTester);
+                if (!bannedVectorOfAgents.contains(msg.getSender())) {
+                    String[] partsMessage = msg.getContent().split(":");
+                    int tempX = Integer.parseInt(partsMessage[0]);
+                    int tempY = Integer.parseInt(partsMessage[1]);
+                    System.out.println("SERWER ACCEPT_PROPOSAL: " + myAgent.getName() + " X " + currentX + " Y " + currentY + " = " + Integer.parseInt(partsMessage[2]));
+                    valueFromAgentJudge = Integer.parseInt(partsMessage[2]);
+                    if (valueFromAgentJudge == valueToVerification) {
+                        System.out.println("))))))))))))SERWER MOWI: KLAMCA JEST " + agentTester);
+                        bannedVectorOfAgents.addElement(agentTester);
+                        vectorOfAgents.remove(agentTester);
+                    } else if (valueFromAgentJudge == valueFromAgentTester) {
+                        System.out.println("))))))))))))SERWER MOWI: KLAMCA JEST " + agentVerification);
+                        bannedVectorOfAgents.addElement(agentVerification);
+                        vectorOfAgents.remove(agentVerification);
+                    }
+//                    arrayC[tempY][tempX] = Integer.parseInt(partsMessage[2]);
+                    arrayC[tempY][tempX] = Integer.parseInt(partsMessage[2]);
+                    progressArray[tempY][tempX] = 2; //State 2 = get value from client
                 }
-                else if(valueFromAgentJudge == valueFromAgentTester) {
-                    System.out.println("))))))))))))SERWER MOWI: KLAMCA JEST " + agentVerification);
-                    bannedVectorOfAgents.addElement(agentVerification);
-                    vectorOfAgents.remove(agentVerification);
-                }
-                arrayC[tempY][tempX] = Integer.parseInt(partsMessage[2]);
-                progressArray[tempY][tempX] = 2; //State 2 = get value from client
             }
 
         }

@@ -15,21 +15,5 @@ public class MaliciousAgent extends CountingAgent {
     protected void setup() {
         super.setup();
         System.out.println("HAY TU OSZUST");
-        searchServers();
-        
     }
-
-//        vectorOfServers.clear();
-//        searchServers();
-//        while(vectorOfServers.isEmpty()) {searchServers();}
-//
-//        HandlingServerBehaviour handlingServerBehaviour = new HandlingServerBehaviour();
-//        handlingServerBehaviour.setServer(vectorOfServers.firstElement());
-//        addBehaviour(handlingServerBehaviour);
-//    }
-//    protected void searchServers()
-//    {
-//        super.searchServers();
-//    }
-
 }

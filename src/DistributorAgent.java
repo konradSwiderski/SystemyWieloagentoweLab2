@@ -1,11 +1,8 @@
 import jade.core.Agent;
-import jade.core.behaviours.Behaviour;
-import jade.core.behaviours.TickerBehaviour;
 import jade.domain.DFService;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.domain.FIPAException;
-import java.util.concurrent.ThreadLocalRandom;
 
 
 public class DistributorAgent extends Agent
@@ -32,19 +29,21 @@ public class DistributorAgent extends Agent
         }
 
         //init arrays
-        InputContainer inputContainerA = new InputContainer(3,3);
-        inputContainerA.fillArray();
-        int[][] arrayA = inputContainerA.getInputArray();
+        InputContainer containerA = new InputContainer(6,6);
+        containerA.fillArray();
+        int[][] arrayA = containerA.getArray();
 
-        InputContainer inputContainerB = new InputContainer(3,3);
-        inputContainerB.fillArray();
-        int[][] arrayB = inputContainerA.getInputArray();
+        InputContainer containerB = new InputContainer(6,6);
+        containerB.fillArray();
+        int[][] arrayB = containerB.getArray();
 
-        int[][] arrayC = new int[inputContainerA.getSizeX()][inputContainerB.getSizeY()];
+        InputContainer containerC = new InputContainer(containerA.getSizeX(),containerB.getSizeY());
+//        containerC.initArray();
+        int[][] arrayC = containerC.getArray();
 
-        OutputContainer outputContainerC = new OutputContainer (3,3);
-        outputContainerC.initProgressArray();
-        int[][] progressArray = outputContainerC.getProgressArray();
+        InputContainer progressContainer = new InputContainer(containerC.getSizeX(),containerC.getSizeY());
+        progressContainer.initArray();
+        int[][] progressArray = progressContainer.getArray();
 
         //ADD Handling Client behaviour
         HandlingClientBehaviour handlingClientBehaviour = new HandlingClientBehaviour();
