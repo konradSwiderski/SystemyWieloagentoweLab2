@@ -10,43 +10,41 @@ import jade.lang.acl.ACLMessage;
 
 import java.util.Vector;
 import java.util.concurrent.ThreadLocalRandom;
-public class CountingAgent extends Agent{
+
+public class CountingAgent extends Agent {
 
     protected Vector<AID> vectorOfServers = new Vector<>();
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     @Override
-    protected void setup()
-    {
+    protected void setup() {
         super.setup();
-        System.out.println("HAY TO PRAWDZIWY");
         vectorOfServers.clear();
         searchServers();
-        while(vectorOfServers.isEmpty()) {searchServers();}
+        while (vectorOfServers.isEmpty()) {//search servers
+            searchServers();
+        }
 
-            HandlingServerBehaviour handlingServerBehaviour = new HandlingServerBehaviour();
-            handlingServerBehaviour.setServer(vectorOfServers.firstElement());
-            addBehaviour(handlingServerBehaviour);
+        //ADD Handling Server behaviour and set members
+        HandlingServerBehaviour handlingServerBehaviour = new HandlingServerBehaviour();
+        handlingServerBehaviour.setServer(vectorOfServers.firstElement());
+        addBehaviour(handlingServerBehaviour);
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    protected void searchServers()
-    {
+    protected void searchServers() {
         DFAgentDescription template = new DFAgentDescription();
         ServiceDescription sd = new ServiceDescription();
         sd.setType("Arrays");
         sd.setName("DistributorAgent");
         template.addServices(sd);
-        try
-        {
+        try {
             DFAgentDescription[] result = DFService.search(this, template);
-            for(int i = 0; i < result.length; ++i)
+            for (int i = 0; i < result.length; ++i)
                 vectorOfServers.addElement(result[i].getName());
-        }
-        catch (FIPAException ex)
-        {
+        } catch (FIPAException ex) {
             ex.printStackTrace();
         }
     }

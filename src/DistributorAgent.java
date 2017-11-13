@@ -5,11 +5,9 @@ import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.domain.FIPAException;
 
 
-public class DistributorAgent extends Agent
-{
+public class DistributorAgent extends Agent {
     @Override
-    protected void setup()
-    {
+    protected void setup() {
         super.setup();
 
         //Register agent
@@ -19,33 +17,30 @@ public class DistributorAgent extends Agent
         sd.setType("Arrays");
         sd.setName("DistributorAgent");
         dfd.addServices(sd);
-        try
-        {
+        try {
             DFService.register(this, dfd);
-        }
-        catch(FIPAException ex)
-        {
+        } catch (FIPAException ex) {
             ex.printStackTrace();
         }
 
-        //init arrays
-        InputContainer containerA = new InputContainer(6,6);
+        //init arrays A,B,C,progress
+        ArrayContainer containerA = new ArrayContainer(4, 4);
         containerA.fillArray();
         int[][] arrayA = containerA.getArray();
 
-        InputContainer containerB = new InputContainer(6,6);
+        ArrayContainer containerB = new ArrayContainer(4, 4);
         containerB.fillArray();
         int[][] arrayB = containerB.getArray();
 
-        InputContainer containerC = new InputContainer(containerA.getSizeX(),containerB.getSizeY());
-//        containerC.initArray();
+        ArrayContainer containerC = new ArrayContainer(containerA.getSizeX(), containerB.getSizeY());
+        containerC.initArray();
         int[][] arrayC = containerC.getArray();
 
-        InputContainer progressContainer = new InputContainer(containerC.getSizeX(),containerC.getSizeY());
+        ArrayContainer progressContainer = new ArrayContainer(containerC.getSizeX(), containerC.getSizeY());
         progressContainer.initArray();
         int[][] progressArray = progressContainer.getArray();
 
-        //ADD Handling Client behaviour
+        //ADD Handling Client behaviour and set members
         HandlingClientBehaviour handlingClientBehaviour = new HandlingClientBehaviour();
         handlingClientBehaviour.setArrayA(arrayA);
         handlingClientBehaviour.setArrayB(arrayB);
@@ -54,6 +49,5 @@ public class DistributorAgent extends Agent
         addBehaviour(handlingClientBehaviour);
 
         System.out.println("Server has been started");
-
     }
 }

@@ -1,13 +1,11 @@
 import jade.core.AID;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
-import jade.lang.acl.MessageTemplate;
 
 import java.util.Vector;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class HandlingServerBehaviour extends CyclicBehaviour
-{
+public class HandlingServerBehaviour extends CyclicBehaviour {
     private AID server;
     private int currentY = 0;
     private int currentX = 0;
@@ -15,9 +13,7 @@ public class HandlingServerBehaviour extends CyclicBehaviour
     Vector<Integer> columnsInt = new Vector<Integer>();
     private int valueOfArrayC = 0;
     private StringBuilder msgStringBuilder = new StringBuilder("");
-    private int failCalucaltion = 0;
-    private String agentName;
-    private boolean maliciousAgent = false;
+    private int failCalculations = 0;
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -27,40 +23,28 @@ public class HandlingServerBehaviour extends CyclicBehaviour
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public void action()
-    {
-        System.out.println("....................." + myAgent.getName());
-        agentName = myAgent.getName();
-        if(myAgent.getClass().toString().equals("class MaliciousAgent"))
-        {
-            System.out.println("Jestem ten zly");
-            maliciousAgent = true;
-        }
-        else
-        {
-            System.out.println("Jestem ten dobry");
-            maliciousAgent = false;
-        }
-        ACLMessage msg = myAgent.receive(); //set pattern and filter to request
-        if (msg!= null)
-        {
-            if(msg.getPerformative() == ACLMessage.REQUEST) //Make calculation
+    public void action() {
+        isMaliciousAgent(); //normal or malicious agent?
+
+        ACLMessage msg = myAgent.receive();
+        if (msg != null) {
+            if (msg.getPerformative() == ACLMessage.REQUEST) //MAKE CALCULATIONS
             {
-                System.out.println("Client odebral " + msg.getContent());
-                String[] partsMessage = msg.getContent().split(":");
+                String[] partsMessage = msg.getContent().split(":"); //currentX:currentY:rows:columns
                 currentX = Integer.parseInt(partsMessage[0]);
                 currentY = Integer.parseInt(partsMessage[1]);
+
+                //get rows and columns
                 String[] rowsString = partsMessage[2].split(",");
                 String[] columnsString = partsMessage[3].split(",");
-                for(int i = 0; i < rowsString.length; i++)
+                for (int i = 0; i < rowsString.length; i++)
                     rowsInt.addElement(Integer.parseInt(rowsString[i]));
-                for(int i = 0; i < columnsString.length; i++)
+                for (int i = 0; i < columnsString.length; i++)
                     columnsInt.addElement(Integer.parseInt(columnsString[i]));
 
-                failCalucaltion = ThreadLocalRandom.current().nextInt(1, 10 + 1);
-                if(failCalucaltion < 3)
-                {
-                    System.out.println("_____________FAIL: my posioton " + currentX + currentY );
+                failCalculations = ThreadLocalRandom.current().nextInt(1, 10 + 1);//will be fail?
+                if (failCalculations < 3) { //Fail
+                    System.out.println("failCalculation " + currentX + currentY);
 
                     ACLMessage reply = new ACLMessage(ACLMessage.FAILURE);
                     reply.addReceiver(server);
@@ -69,55 +53,54 @@ public class HandlingServerBehaviour extends CyclicBehaviour
                     msgStringBuilder.append(currentY);
                     reply.setContent(msgStringBuilder.toString());
                     myAgent.send(reply);
-                    block(2000);
-                }
-                else
-                {
-                    for (int i = 0; i < rowsString.length; i++)
+
+                    block(2000); //block client
+                } else { //No fail
+                    for (int i = 0; i < rowsString.length; i++) //get fragment of arrayC
                         valueOfArrayC = valueOfArrayC + rowsInt.elementAt(i) * columnsInt.elementAt(i);
 
-                    if(maliciousAgent == true) //this if failAgent?
+                    if (isMaliciousAgent()) //this is maliciousAgent? if yes, valueOfArrayC = 0;
                         valueOfArrayC = 0;
-                    block(ThreadLocalRandom.current().nextInt(1000, 1500 + 1));
 
-                    ACLMessage reply = new ACLMessage(ACLMessage.REQUEST);
-                    reply.addReceiver(server);
-                    reply.setPerformative(ACLMessage.CONFIRM);
+                    block(ThreadLocalRandom.current().nextInt(1000, 1500 + 1)); //block client
+
+                    //send message with value
+                    ACLMessage reply = new ACLMessage(ACLMessage.CONFIRM);
+                    reply.addReceiver(server);;
                     msgStringBuilder.append(currentX);
                     msgStringBuilder.append(":");
                     msgStringBuilder.append(currentY);
                     msgStringBuilder.append(":");
                     reply.setContent(msgStringBuilder.append(valueOfArrayC).toString());
-                    System.out.println("_____________WARTOSC:" + valueOfArrayC);
                     myAgent.send(reply);
                 }
+
                 //clear
-                msgStringBuilder.delete(0,msgStringBuilder.length());
+                msgStringBuilder.delete(0, msgStringBuilder.length());
                 valueOfArrayC = 0;
                 rowsInt.clear();
                 columnsInt.clear();
-            }
-            else if(msg.getPerformative() == ACLMessage.CANCEL) //Die
+            } else if (msg.getPerformative() == ACLMessage.CANCEL) //DIE
             {
                 myAgent.doDelete();
-            }
-            else if(msg.getPerformative() == ACLMessage.PROPOSE) //tryb potwierdzenia //agentTester
+            } else if (msg.getPerformative() == ACLMessage.PROPOSE) //VERIFICATION LEVEL1 #agentTester
             {
-
-                String[] partsMessage = msg.getContent().split(":");
+                String[] partsMessage = msg.getContent().split(":"); //currentX:currentY:rows:columns
                 currentX = Integer.parseInt(partsMessage[0]);
                 currentY = Integer.parseInt(partsMessage[1]);
+
+                //get rows and columns
                 String[] rowsString = partsMessage[2].split(",");
                 String[] columnsString = partsMessage[3].split(",");
-                for(int i = 0; i < rowsString.length; i++)
-                    rowsInt.addElement(Integer.parseInt(rowsString[i]));
-                for(int i = 0; i < columnsString.length; i++)
-                    columnsInt.addElement(Integer.parseInt(columnsString[i]));
                 for (int i = 0; i < rowsString.length; i++)
+                    rowsInt.addElement(Integer.parseInt(rowsString[i]));
+                for (int i = 0; i < columnsString.length; i++)
+                    columnsInt.addElement(Integer.parseInt(columnsString[i]));
+
+                for (int i = 0; i < rowsString.length; i++) //get fragment of arrayC
                     valueOfArrayC = valueOfArrayC + rowsInt.elementAt(i) * columnsInt.elementAt(i);
 
-                System.out.println("CONFIRM: " + myAgent.getName() + " X " + currentX + " Y " + currentY + " = " + valueOfArrayC);
-
+                //create message
                 ACLMessage reply = new ACLMessage(ACLMessage.PROPOSE);
                 reply.addReceiver(server);
                 msgStringBuilder.append(currentX);
@@ -128,27 +111,28 @@ public class HandlingServerBehaviour extends CyclicBehaviour
                 myAgent.send(reply);
 
                 //clear
-                msgStringBuilder.delete(0,msgStringBuilder.length());
+                msgStringBuilder.delete(0, msgStringBuilder.length());
                 valueOfArrayC = 0;
                 rowsInt.clear();
                 columnsInt.clear();
-            }
-            else if(msg.getPerformative() == ACLMessage.ACCEPT_PROPOSAL) //akceptacja //agentJudge
+            } else if (msg.getPerformative() == ACLMessage.ACCEPT_PROPOSAL) //VERIFICATION LEVEL2 #agentJudge
             {
-                String[] partsMessage = msg.getContent().split(":");
+                String[] partsMessage = msg.getContent().split(":"); //currentX:currentY:rows:columns
                 currentX = Integer.parseInt(partsMessage[0]);
                 currentY = Integer.parseInt(partsMessage[1]);
+
+                //get rows and columns
                 String[] rowsString = partsMessage[2].split(",");
                 String[] columnsString = partsMessage[3].split(",");
-                for(int i = 0; i < rowsString.length; i++)
-                    rowsInt.addElement(Integer.parseInt(rowsString[i]));
-                for(int i = 0; i < columnsString.length; i++)
-                    columnsInt.addElement(Integer.parseInt(columnsString[i]));
                 for (int i = 0; i < rowsString.length; i++)
+                    rowsInt.addElement(Integer.parseInt(rowsString[i]));
+                for (int i = 0; i < columnsString.length; i++)
+                    columnsInt.addElement(Integer.parseInt(columnsString[i]));
+
+                for (int i = 0; i < rowsString.length; i++) //get fragment of arrayC
                     valueOfArrayC = valueOfArrayC + rowsInt.elementAt(i) * columnsInt.elementAt(i);
 
-                System.out.println("ACCEPT_PROPOSAL: " + myAgent.getName() + " X " + currentX + " Y " + currentY + " = " + valueOfArrayC);
-
+                //create message
                 ACLMessage reply = new ACLMessage(ACLMessage.ACCEPT_PROPOSAL);
                 reply.addReceiver(server);
                 msgStringBuilder.append(currentX);
@@ -159,18 +143,26 @@ public class HandlingServerBehaviour extends CyclicBehaviour
                 myAgent.send(reply);
 
                 //clear
-                msgStringBuilder.delete(0,msgStringBuilder.length());
+                msgStringBuilder.delete(0, msgStringBuilder.length());
                 valueOfArrayC = 0;
                 rowsInt.clear();
                 columnsInt.clear();
             }
-        }
-        else
-        {
-            ACLMessage reply = new ACLMessage(ACLMessage.REQUEST);
+        } else {
+            ACLMessage reply = new ACLMessage(ACLMessage.REQUEST); //I'm ready to get new fragment
             reply.addReceiver(server);
             myAgent.send(reply);
             block();
         }
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public boolean isMaliciousAgent()
+    {
+        if (myAgent.getClass().toString().equals("class MaliciousAgent"))
+            return true;
+        else
+            return false;
     }
 }
