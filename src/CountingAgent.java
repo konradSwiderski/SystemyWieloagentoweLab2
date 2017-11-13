@@ -1,15 +1,11 @@
 import jade.core.AID;
 import jade.core.Agent;
-import jade.core.behaviours.Behaviour;
-import jade.core.behaviours.TickerBehaviour;
 import jade.domain.DFService;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.domain.FIPAException;
-import jade.lang.acl.ACLMessage;
 
 import java.util.Vector;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class CountingAgent extends Agent {
 
@@ -26,9 +22,9 @@ public class CountingAgent extends Agent {
         while (vectorOfServers.isEmpty()) { searchServers(); }
 
         //ADD Handling Server behaviour and set members
-        HandlingServerBehaviour handlingServerBehaviour = new HandlingServerBehaviour();
-        handlingServerBehaviour.setServer(vectorOfServers.firstElement());
-        addBehaviour(handlingServerBehaviour);
+        ClientCyclicBehaviour clientCyclicBehaviour = new ClientCyclicBehaviour();
+        clientCyclicBehaviour.setServer(vectorOfServers.firstElement());
+        addBehaviour(clientCyclicBehaviour);
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////

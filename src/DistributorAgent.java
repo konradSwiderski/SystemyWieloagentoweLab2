@@ -41,12 +41,12 @@ public class DistributorAgent extends Agent {
         int[][] progressArray = progressContainer.getArray();
 
         //ADD Handling Client behaviour and set members
-        HandlingClientBehaviour handlingClientBehaviour = new HandlingClientBehaviour();
-        handlingClientBehaviour.setArrayA(arrayA);
-        handlingClientBehaviour.setArrayB(arrayB);
-        handlingClientBehaviour.setArrayC(arrayC);
-        handlingClientBehaviour.setProgressArray(progressArray);
-        addBehaviour(handlingClientBehaviour);
+        ServerCyclicBehaviour serverCyclicBehaviour = new ServerCyclicBehaviour();
+        serverCyclicBehaviour.setArrayA(arrayA);
+        serverCyclicBehaviour.setArrayB(arrayB);
+        serverCyclicBehaviour.setArrayC(arrayC);
+        serverCyclicBehaviour.setProgressArray(progressArray);
+        addBehaviour(serverCyclicBehaviour);
 
         System.out.println("Server has been started");
     }

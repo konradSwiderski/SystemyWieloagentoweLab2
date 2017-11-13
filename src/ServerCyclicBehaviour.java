@@ -1,12 +1,10 @@
 import jade.core.AID;
-import jade.core.behaviours.CyclicBehaviour;
-import jade.lang.acl.ACLMessage;
-import jade.lang.acl.MessageTemplate;
+        import jade.core.behaviours.CyclicBehaviour;
+        import jade.lang.acl.ACLMessage;
 
-import java.util.Vector;
-import java.util.concurrent.ThreadLocalRandom;
+        import java.util.Vector;
 
-public class HandlingClientBehaviour extends CyclicBehaviour
+public class ServerCyclicBehaviour extends CyclicBehaviour
 {
     private int[][] arrayA;
     private int[][] arrayB;
@@ -58,20 +56,14 @@ public class HandlingClientBehaviour extends CyclicBehaviour
                 //Add new Agent
                 if(!vectorOfAgents.contains(msg.getSender()))
                     vectorOfAgents.addElement(msg.getSender());
-                System.out.println("********************************************");
-                for(int i =0; i < vectorOfAgents.size(); i++)
-                    System.out.println("CORRECT: " + vectorOfAgents.elementAt(i));
-                System.out.println("********");
-                for(int i =0; i < bannedVectorOfAgents.size(); i++)
-                    System.out.println("BANNED: " + bannedVectorOfAgents.elementAt(i));
-                System.out.println("********************************************");
             }
             if(msg.getPerformative() == ACLMessage.REQUEST) //CLIENT IS READY #SENDING DATA TO HIM
             {
                 if((currentY == arrayC[0].length - 1) && (currentX == arrayC.length - 1)) //it is the end of array?
                 {
                     //checking progress array
-                    System.out.println("____Time to check progress array____");
+                    clearValues();
+                    System.out.println("Time to check progress array...");
                     numberOfFails = 0;
                     outerLoop:
                     for(int i = 0; i < progressArray.length; i++)
@@ -82,28 +74,17 @@ public class HandlingClientBehaviour extends CyclicBehaviour
                             if(progressArray[i][j] != 2)
                             {
                                 numberOfFails++;
-                                System.out.println("__Found fail in position: " + i + j);
+                                System.out.println();
+                                System.out.println("__Found fail in position: " + i + "," + j);
 
                                 //Prepare rows and columns
                                 prepareRowsAndColumns(i,j);
 
-                                System.out.println("ROWS: " + rowsStringBuilder + "COLS: " + columnsStringBuilder + msg.getSender());
-
-                                //Create msg with data
                                 if(!bannedVectorOfAgents.contains(msg.getSender()))
                                 {
-//                                    ACLMessage reply = msg.createReply();
-//                                    reply.setPerformative(ACLMessage.REQUEST);
-//                                    msgStringBuilder.append(j);
-//                                    msgStringBuilder.append(":");
-//                                    msgStringBuilder.append(i);
-//                                    msgStringBuilder.append(":");
-//                                    msgStringBuilder.append(rowsStringBuilder);
-//                                    msgStringBuilder.append(":");
-//                                    reply.setContent(msgStringBuilder.append(columnsStringBuilder).toString());
-//                                    myAgent.send(reply);
+                                    //Create msg with data
+                                    sendMessage(j,i,msg.getSender(),ACLMessage.REQUEST);
 
-                                    sendMessage(j,i,msg.getSender(), ACLMessage.REQUEST);
                                     //clear
                                     clearValues();
                                 }
@@ -114,6 +95,13 @@ public class HandlingClientBehaviour extends CyclicBehaviour
                     }
                     if(numberOfFails == 0)
                     {
+                        System.out.println("------------CORRECT LIST OF AGENTS------------");
+                        for(int i =0; i < vectorOfAgents.size(); i++)
+                            System.out.println("CORRECT: " + vectorOfAgents.elementAt(i));
+                        System.out.println("------------BANNED LIST OF AGENTS------------");
+                        for(int i =0; i < bannedVectorOfAgents.size(); i++)
+                            System.out.println("BANNED: " + bannedVectorOfAgents.elementAt(i));
+
                         ACLMessage reply = msg.createReply();
                         reply.setPerformative(ACLMessage.CANCEL);
                         myAgent.send(reply);
@@ -127,7 +115,8 @@ public class HandlingClientBehaviour extends CyclicBehaviour
                             }
                             System.out.println();
                         }
-                        System.out.println("the end");
+                        System.out.println("----------------");
+                        System.out.println("The end");
                     }
 
                     //reset
@@ -143,33 +132,10 @@ public class HandlingClientBehaviour extends CyclicBehaviour
                     }
 
                     //Prepare rows and columns
-                    for (int i = 0; i < arrayA[0].length; i++)
-                    {
-                        rowsStringBuilder.append((arrayA[currentY][i]));
-                        if (i != arrayA[0].length - 1)
-                        {
-                            rowsStringBuilder.append(",");
-                        }
-
-                    }
-                    for (int i = 0; i < arrayB.length; i++)
-                    {
-                        columnsStringBuilder.append(arrayB[i][currentX]);
-                        if (i != arrayB.length - 1)
-                            columnsStringBuilder.append(",");
-                    }
+                    prepareRowsAndColumns(currentY,currentX);
 
                     //Create msg with data
-                    ACLMessage reply = msg.createReply();
-                    reply.setPerformative(ACLMessage.REQUEST);
-                    msgStringBuilder.append(currentX);
-                    msgStringBuilder.append(":");
-                    msgStringBuilder.append(currentY);
-                    msgStringBuilder.append(":");
-                    msgStringBuilder.append(rowsStringBuilder);
-                    msgStringBuilder.append(":");
-                    reply.setContent(msgStringBuilder.append(columnsStringBuilder).toString());
-                    myAgent.send(reply);
+                    sendMessage(currentX,currentY,msg.getSender(),ACLMessage.REQUEST);
 
                     //State 1 = sent data to client
                     progressArray[currentY][currentX] = 1;
@@ -189,8 +155,8 @@ public class HandlingClientBehaviour extends CyclicBehaviour
                 if((isVerification % 3) == 0 && !bannedVectorOfAgents.contains(msg.getSender())) //Verification or not?
                 {
                     agentVerification = msg.getSender();
-
-                    System.out.println("Verification proces:  " + tempX + "," + tempY + " = " + Integer.parseInt(partsMessage[2]));
+                    System.out.println("Verification process PART1: " + tempX + "," + tempY + " = " + Integer.parseInt(partsMessage[2]) + " agentName: " + msg.getSender());
+                    System.out.println("Finding agentTester...");
                     for(int i = 0; i < vectorOfAgents.size(); i++)
                     {
                         //Find agentTester
@@ -202,32 +168,10 @@ public class HandlingClientBehaviour extends CyclicBehaviour
                     }
 
                     //Prepare rows and columns
-                    for (int k = 0; k < arrayA[0].length; k++)
-                    {
-                        rowsStringBuilder.append((arrayA[tempY][k]));
-                        if (k != arrayA[0].length - 1)
-                        {
-                            rowsStringBuilder.append(",");
-                        }
-                    }
-                    for (int k = 0; k < arrayB.length; k++)
-                    {
-                        columnsStringBuilder.append(arrayB[k][tempX]);
-                        if (k != arrayB.length - 1)
-                            columnsStringBuilder.append(",");
-                    }
+                    prepareRowsAndColumns(tempY,tempX);
 
                     //Create and send message
-                    ACLMessage reply = new ACLMessage(ACLMessage.PROPOSE);
-                    reply.addReceiver(agentTester);
-                    msgStringBuilder.append(tempX);
-                    msgStringBuilder.append(":");
-                    msgStringBuilder.append(tempY);
-                    msgStringBuilder.append(":");
-                    msgStringBuilder.append(rowsStringBuilder);
-                    msgStringBuilder.append(":");
-                    reply.setContent(msgStringBuilder.append(columnsStringBuilder).toString());
-                    myAgent.send(reply);
+                    sendMessage(tempX,tempY,agentTester,ACLMessage.PROPOSE);
 
                     //Clear
                     clearValues();
@@ -251,8 +195,8 @@ public class HandlingClientBehaviour extends CyclicBehaviour
 
                 if(valueToVerification == Integer.parseInt(partsMessage[2]))
                 {
-                    System.out.println("Result of verification: ACCEPT");
-
+                    System.out.println("Verification process PART2: ACCEPT " + tempX + "," + tempY + " = " + Integer.parseInt(partsMessage[2]) + " agentName: " + msg.getSender());
+                    System.out.println("End of verification");
                     //The end of verification #Correct Value of arrayC
                     arrayC[tempY][tempX] = Integer.parseInt(partsMessage[2]);
 
@@ -261,7 +205,8 @@ public class HandlingClientBehaviour extends CyclicBehaviour
                 }
                 else
                 {
-                    System.out.println("Result of verification: NOT ACCEPT");
+                    System.out.println("Verification process PART2: NOT ACCEPT " + tempX + "," + tempY + " = " + Integer.parseInt(partsMessage[2]) + " agentName: " + msg.getSender());
+                    System.out.println("Finding agentJudge...");
 
                     //Find agentJudge
                     for(int i = 0; i < vectorOfAgents.size(); i++)
@@ -274,31 +219,10 @@ public class HandlingClientBehaviour extends CyclicBehaviour
                     }
 
                     //Prepare rows and columns
-                    for (int k = 0; k < arrayA[0].length; k++)
-                    {
-                        rowsStringBuilder.append((arrayA[tempY][k]));
-                        if (k != arrayA[0].length - 1) {
-                            rowsStringBuilder.append(",");
-                        }
-                    }
-                    for (int k = 0; k < arrayB.length; k++)
-                    {
-                        columnsStringBuilder.append(arrayB[k][tempX]);
-                        if (k != arrayB.length - 1)
-                            columnsStringBuilder.append(",");
-                    }
+                    prepareRowsAndColumns(tempY,tempX);
 
                     //Create and send message
-                    ACLMessage reply = new ACLMessage(ACLMessage.ACCEPT_PROPOSAL);
-                    reply.addReceiver(agentJudge);
-                    msgStringBuilder.append(tempX);
-                    msgStringBuilder.append(":");
-                    msgStringBuilder.append(tempY);
-                    msgStringBuilder.append(":");
-                    msgStringBuilder.append(rowsStringBuilder);
-                    msgStringBuilder.append(":");
-                    reply.setContent(msgStringBuilder.append(columnsStringBuilder).toString());
-                    myAgent.send(reply);
+                    sendMessage(tempX,tempY,agentJudge,ACLMessage.ACCEPT_PROPOSAL);
 
                     //Clear
                     clearValues();
@@ -321,13 +245,15 @@ public class HandlingClientBehaviour extends CyclicBehaviour
                     //Who is fake?
                     if (valueFromAgentJudge == valueToVerification)
                     {
-                        System.out.println("FAKE IS: " + agentTester);
+                        System.out.println("Verification process PART3: FAKE IS " + agentTester + "with value: " + valueFromAgentTester);
+                        System.out.println("__End of verification");
                         bannedVectorOfAgents.addElement(agentTester);
                         vectorOfAgents.remove(agentTester);
                     }
                     else if (valueFromAgentJudge == valueFromAgentTester)
                     {
-                        System.out.println("FAKE IS: " + agentVerification);
+                        System.out.println("Verification process PART3: FAKE IS " + agentVerification + "with value: " + valueToVerification);
+                        System.out.println("__End of verification");
                         bannedVectorOfAgents.addElement(agentVerification);
                         vectorOfAgents.remove(agentVerification);
                     }

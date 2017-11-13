@@ -5,12 +5,12 @@ import jade.lang.acl.ACLMessage;
 import java.util.Vector;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class HandlingServerBehaviour extends CyclicBehaviour {
+public class ClientCyclicBehaviour extends CyclicBehaviour {
     private AID server;
     private int currentY = 0;
     private int currentX = 0;
-    private Vector<Integer> rowsInt = new Vector<Integer>();
-    private Vector<Integer> columnsInt = new Vector<Integer>();
+    private Vector<Integer> rowsInt = new Vector<>();
+    private Vector<Integer> columnsInt = new Vector<>();
     private String[] rowsString;
     private String[] columnsString;
     private int valueOfArrayC = 0;
@@ -39,7 +39,6 @@ public class HandlingServerBehaviour extends CyclicBehaviour {
 
                 if (failCalculations < 3) //Fail
                 {
-
                     //prepare and send message
                     ACLMessage reply = prepareMessage(ACLMessage.FAILURE);
                     reply.setContent(msgStringBuilder.toString());
@@ -146,7 +145,7 @@ public class HandlingServerBehaviour extends CyclicBehaviour {
 
     public void makeCalculations()
     {
-        for (int i = 0; i < rowsString.length; i++) //get fragment of arrayC
+        for (int i = 0; i < rowsString.length; i++)
             valueOfArrayC = valueOfArrayC + rowsInt.elementAt(i) * columnsInt.elementAt(i);
     }
 
