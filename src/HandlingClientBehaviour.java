@@ -1,8 +1,10 @@
+import jade.core.AID;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
 import java.util.Vector;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class HandlingClientBehaviour extends CyclicBehaviour
 {
@@ -18,7 +20,13 @@ public class HandlingClientBehaviour extends CyclicBehaviour
     private int currentY = 0;
     private int currentX = -1;
     private int numberOfFails = 0;
-    private Vector<String> vectorOfAgents = new Vector<>();
+    private Vector<AID> vectorOfAgents = new Vector<>();
+    private Vector<String> bannedVectorOfAgents = new Vector<>();
+    private int isVerification = 0;
+    private int valueToVerification = 0;
+    private AID agentVerification = null;
+    private AID agentTester = null;
+    private AID agentJudge = null;
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -45,8 +53,8 @@ public class HandlingClientBehaviour extends CyclicBehaviour
         ACLMessage msg = myAgent.receive();
         if (msg!= null)
         {
-            if(!vectorOfAgents.contains(msg.getSender().toString())) //Add Agent Vector
-                vectorOfAgents.addElement(msg.getSender().toString());
+            if(!vectorOfAgents.contains(msg.getSender())) //Add Agent Vector
+                vectorOfAgents.addElement(msg.getSender());
             if(msg.getPerformative() == ACLMessage.REQUEST) //Client is ready
             {
                 if((currentY == arrayC[0].length - 1) && (currentX == arrayC.length - 1)) //ALL ELEMENTS?
@@ -172,13 +180,74 @@ public class HandlingClientBehaviour extends CyclicBehaviour
             }
             else if(msg.getPerformative() == ACLMessage.CONFIRM) //Get value of ArrayC
             {
-                //potwierdzenie
                 String[] partsMessage = msg.getContent().split(":");
                 int tempX = Integer.parseInt(partsMessage[0]);
                 int tempY = Integer.parseInt(partsMessage[1]);
-                arrayC[tempY][tempX] = Integer.parseInt(partsMessage[2]);
-                //State 2 = get value from client
-                progressArray[tempY][tempX] = 2;
+                //weryfikacja////////////////////////////////////////////////////////////////////////////////////////////////////
+//                isVerification = ThreadLocalRandom.current().nextInt(1, 10 + 1);
+                isVerification++;
+                if((isVerification % 3) == 0)
+                {
+                    AID agentVerification = msg.getSender();
+                    AID agentTester = null;
+                    AID agentJudge = null;
+                    System.out.println("////////////////////////////////////////Proces weryfikacji " + tempX + "," + tempY + " = " + Integer.parseInt(partsMessage[2]));
+                    for(int i = 0; i < vectorOfAgents.size(); i++)
+                    {
+
+                        if(!vectorOfAgents.elementAt(i).toString().equals(agentVerification.toString()))
+                        {
+                            agentTester = vectorOfAgents.elementAt(i);
+                            break;
+                        }
+                    }
+
+                    System.out.println("agentWeryfikowany " + agentVerification);
+                    System.out.println("agentTestowany " + agentTester);
+                    System.out.println("////////////////////////////////////////");
+                    //send msg with x,y,rows,and columns////////////////////////////////////////////////////////////////////////////
+                    ACLMessage reply = new ACLMessage(ACLMessage.PROPOSE);
+                    reply.addReceiver(agentTester);
+                    //rows and columns
+                    for (int k = 0; k < arrayA[0].length; k++) {
+                        rowsStringBuilder.append((arrayA[tempY][k]));
+                        if (k != arrayA[0].length - 1) {
+                            rowsStringBuilder.append(",");
+                        }
+
+                    }
+                    System.out.print("ROWS: ");
+                    System.out.println(rowsStringBuilder);
+
+                    for (int k = 0; k < arrayB.length; k++) {
+                        columnsStringBuilder.append(arrayB[k][tempX]);
+                        if (k != arrayB.length - 1)
+                            columnsStringBuilder.append(",");
+                    }
+                    System.out.print("COLUMNS: ");
+                    System.out.println(columnsStringBuilder);
+                    System.out.println("//////// KONIEC WERYFIKACJI ROWS " + rowsStringBuilder + "COLUMNS " + columnsStringBuilder);
+                    //Create msg
+                    msgStringBuilder.append(tempX);
+                    msgStringBuilder.append(":");
+                    msgStringBuilder.append(tempY);
+                    msgStringBuilder.append(":");
+                    msgStringBuilder.append(rowsStringBuilder);
+                    msgStringBuilder.append(":");
+                    reply.setContent(msgStringBuilder.append(columnsStringBuilder).toString());
+                    myAgent.send(reply);
+                    msgStringBuilder.delete(0,msgStringBuilder.length());
+                    rowsStringBuilder.delete(0,rowsStringBuilder.length());
+                    columnsStringBuilder.delete(0,columnsStringBuilder.length());
+
+                    valueToVerification = Integer.parseInt(partsMessage[2]);
+                }
+                else
+                {
+                    arrayC[tempY][tempX] = Integer.parseInt(partsMessage[2]);
+                    progressArray[tempY][tempX] = 2; //State 2 = get value from client
+                }
+
             }
             else if(msg.getPerformative() == ACLMessage.FAILURE)
             {
@@ -190,6 +259,30 @@ public class HandlingClientBehaviour extends CyclicBehaviour
 //                progressArray[tempY][tempX] = 0;
                 System.out.print(">>>>>>>>>>>>>>>>>>>>>>>>>>.");
                 System.out.println(arrayB[tempX][tempY]);
+            }
+            else if(msg.getPerformative() == ACLMessage.PROPOSE) //agentTester
+            {
+                String[] partsMessage = msg.getContent().split(":");
+                int tempX = Integer.parseInt(partsMessage[0]);
+                int tempY = Integer.parseInt(partsMessage[1]);
+                System.out.println("PROPOSE: " + myAgent.getName() + " X " + currentX + " Y " + currentY + " = " + Integer.parseInt(partsMessage[2]));
+
+                if(valueToVerification == Integer.parseInt(partsMessage[2]))
+                {
+                    System.out.println(")))))))))))))))))Weryfikacja przeprowdzona: ZGODA");
+                    arrayC[tempY][tempX] = Integer.parseInt(partsMessage[2]);
+                    progressArray[tempY][tempX] = 2; //State 2 = get value from client
+                }
+                else
+                {
+                    System.out.println(")))))))))))))))))Weryfikacja przeprowdzona: NIEZGODA");
+                    arrayC[tempY][tempX] = -1;
+                    progressArray[tempY][tempX] = 2; //State 2 = get value from client
+                }
+            }
+            else if(msg.getPerformative() == ACLMessage.ACCEPT_PROPOSAL) //agentJudge
+            {
+
             }
         }
         else

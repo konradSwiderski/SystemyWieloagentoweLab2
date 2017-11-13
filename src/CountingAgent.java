@@ -28,7 +28,6 @@ public class CountingAgent extends Agent{
             HandlingServerBehaviour handlingServerBehaviour = new HandlingServerBehaviour();
             handlingServerBehaviour.setServer(vectorOfServers.firstElement());
             addBehaviour(handlingServerBehaviour);
-
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
