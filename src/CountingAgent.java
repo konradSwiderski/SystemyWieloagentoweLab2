@@ -21,10 +21,9 @@ public class CountingAgent extends Agent {
     protected void setup() {
         super.setup();
         vectorOfServers.clear();
-        searchServers();
-        while (vectorOfServers.isEmpty()) {//search servers
-            searchServers();
-        }
+
+        //search servers
+        while (vectorOfServers.isEmpty()) { searchServers(); }
 
         //ADD Handling Server behaviour and set members
         HandlingServerBehaviour handlingServerBehaviour = new HandlingServerBehaviour();

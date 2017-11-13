@@ -9,13 +9,12 @@ public class HandlingServerBehaviour extends CyclicBehaviour {
     private AID server;
     private int currentY = 0;
     private int currentX = 0;
-    Vector<Integer> rowsInt = new Vector<Integer>();
-    Vector<Integer> columnsInt = new Vector<Integer>();
-    String[] rowsString;
-    String[] columnsString;
+    private Vector<Integer> rowsInt = new Vector<Integer>();
+    private Vector<Integer> columnsInt = new Vector<Integer>();
+    private String[] rowsString;
+    private String[] columnsString;
     private int valueOfArrayC = 0;
     private StringBuilder msgStringBuilder = new StringBuilder("");
-    private int failCalculations = 0;
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -36,7 +35,7 @@ public class HandlingServerBehaviour extends CyclicBehaviour {
                 parseMessage(msg.getContent());
 
                 //will be fail?
-                failCalculations = ThreadLocalRandom.current().nextInt(1, 10 + 1);
+                int failCalculations = ThreadLocalRandom.current().nextInt(1, 10 + 1);
 
                 if (failCalculations < 3) //Fail
                 {
