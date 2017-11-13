@@ -79,9 +79,9 @@ public class HandlingClientBehaviour extends CyclicBehaviour
             else
             {
                 System.out.println("MY NAME IS: " + msg.getSender() + "++++++++++++++++++++++++++++++++Nie masz prawa agencie");
-                ACLMessage reply = msg.createReply();
-                reply.setPerformative(ACLMessage.CANCEL);
-                myAgent.send(reply);
+//                ACLMessage reply = msg.createReply();
+//                reply.setPerformative(ACLMessage.CANCEL);
+//                myAgent.send(reply);
             }
 
 
