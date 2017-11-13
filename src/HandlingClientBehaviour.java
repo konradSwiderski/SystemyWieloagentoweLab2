@@ -60,22 +60,18 @@ public class HandlingClientBehaviour extends CyclicBehaviour
                     vectorOfAgents.addElement(msg.getSender());
                 System.out.println("********************************************");
                 for(int i =0; i < vectorOfAgents.size(); i++)
-                {
                     System.out.println("CORRECT: " + vectorOfAgents.elementAt(i));
-                }
                 System.out.println("********");
                 for(int i =0; i < bannedVectorOfAgents.size(); i++)
-                {
                     System.out.println("BANNED: " + bannedVectorOfAgents.elementAt(i));
-                }
                 System.out.println("********************************************");
             }
-            
             if(msg.getPerformative() == ACLMessage.REQUEST) //CLIENT IS READY #SENDING DATA TO HIM
             {
                 if((currentY == arrayC[0].length - 1) && (currentX == arrayC.length - 1)) //it is the end of array?
                 {
                     //checking progress array
+                    System.out.println("____Time to check progress array____");
                     numberOfFails = 0;
                     outerLoop:
                     for(int i = 0; i < progressArray.length; i++)
@@ -86,41 +82,31 @@ public class HandlingClientBehaviour extends CyclicBehaviour
                             if(progressArray[i][j] != 2)
                             {
                                 numberOfFails++;
-                                System.out.println("Found fail in position: " + i + j);
+                                System.out.println("__Found fail in position: " + i + j);
 
                                 //Prepare rows and columns
-                                for (int k = 0; k < arrayA[0].length; k++)
-                                {
-                                    rowsStringBuilder.append((arrayA[i][k]));
-                                    if (k != arrayA[0].length - 1)
-                                    {
-                                        rowsStringBuilder.append(",");
-                                    }
+                                prepareRowsAndColumns(i,j);
 
-                                }
-                                for (int k = 0; k < arrayB.length; k++)
-                                {
-                                    columnsStringBuilder.append(arrayB[k][j]);
-                                    if (k != arrayB.length - 1)
-                                        columnsStringBuilder.append(",");
-                                }
+                                System.out.println("ROWS: " + rowsStringBuilder + "COLS: " + columnsStringBuilder + msg.getSender());
 
                                 //Create msg with data
-                                ACLMessage reply = msg.createReply();
-                                reply.setPerformative(ACLMessage.REQUEST);
-                                msgStringBuilder.append(j);
-                                msgStringBuilder.append(":");
-                                msgStringBuilder.append(i);
-                                msgStringBuilder.append(":");
-                                msgStringBuilder.append(rowsStringBuilder);
-                                msgStringBuilder.append(":");
-                                reply.setContent(msgStringBuilder.append(columnsStringBuilder).toString());
-                                myAgent.send(reply);
+                                if(!bannedVectorOfAgents.contains(msg.getSender()))
+                                {
+//                                    ACLMessage reply = msg.createReply();
+//                                    reply.setPerformative(ACLMessage.REQUEST);
+//                                    msgStringBuilder.append(j);
+//                                    msgStringBuilder.append(":");
+//                                    msgStringBuilder.append(i);
+//                                    msgStringBuilder.append(":");
+//                                    msgStringBuilder.append(rowsStringBuilder);
+//                                    msgStringBuilder.append(":");
+//                                    reply.setContent(msgStringBuilder.append(columnsStringBuilder).toString());
+//                                    myAgent.send(reply);
 
-                                //clear
-                                msgStringBuilder.delete(0,msgStringBuilder.length());
-                                rowsStringBuilder.delete(0,rowsStringBuilder.length());
-                                columnsStringBuilder.delete(0,columnsStringBuilder.length());
+                                    sendMessage(j,i,msg.getSender(), ACLMessage.REQUEST);
+                                    //clear
+                                    clearValues();
+                                }
                                 break outerLoop;
                             }
                         }
@@ -189,9 +175,7 @@ public class HandlingClientBehaviour extends CyclicBehaviour
                     progressArray[currentY][currentX] = 1;
 
                     //Clear
-                    rowsStringBuilder.delete(0, rowsStringBuilder.length());
-                    columnsStringBuilder.delete(0, columnsStringBuilder.length());
-                    msgStringBuilder.delete(0, msgStringBuilder.length());
+                    clearValues();
                 }
             }
             else if(msg.getPerformative() == ACLMessage.CONFIRM) //GET VALUE FROM CLIENT #VERIFICATIONS
@@ -209,7 +193,7 @@ public class HandlingClientBehaviour extends CyclicBehaviour
                     System.out.println("Verification proces:  " + tempX + "," + tempY + " = " + Integer.parseInt(partsMessage[2]));
                     for(int i = 0; i < vectorOfAgents.size(); i++)
                     {
-                        //find agentTester
+                        //Find agentTester
                         if(!vectorOfAgents.elementAt(i).toString().equals(agentVerification.toString()))
                         {
                             agentTester = vectorOfAgents.elementAt(i);
@@ -218,13 +202,13 @@ public class HandlingClientBehaviour extends CyclicBehaviour
                     }
 
                     //Prepare rows and columns
-                    for (int k = 0; k < arrayA[0].length; k++) {
+                    for (int k = 0; k < arrayA[0].length; k++)
+                    {
                         rowsStringBuilder.append((arrayA[tempY][k]));
                         if (k != arrayA[0].length - 1)
                         {
                             rowsStringBuilder.append(",");
                         }
-
                     }
                     for (int k = 0; k < arrayB.length; k++)
                     {
@@ -245,10 +229,8 @@ public class HandlingClientBehaviour extends CyclicBehaviour
                     reply.setContent(msgStringBuilder.append(columnsStringBuilder).toString());
                     myAgent.send(reply);
 
-                    //clear
-                    msgStringBuilder.delete(0,msgStringBuilder.length());
-                    rowsStringBuilder.delete(0,rowsStringBuilder.length());
-                    columnsStringBuilder.delete(0,columnsStringBuilder.length());
+                    //Clear
+                    clearValues();
 
                     //Set value, which is in verification process
                     valueToVerification = Integer.parseInt(partsMessage[2]);
@@ -281,10 +263,7 @@ public class HandlingClientBehaviour extends CyclicBehaviour
                 {
                     System.out.println("Result of verification: NOT ACCEPT");
 
-                    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                    arrayC[tempY][tempX] = -1;
-                    progressArray[tempY][tempX] = 2; //State 2 = get value from client
-
+                    //Find agentJudge
                     for(int i = 0; i < vectorOfAgents.size(); i++)
                     {
                         if(!vectorOfAgents.elementAt(i).toString().equals(agentVerification.toString()) && !vectorOfAgents.elementAt(i).toString().equals(agentTester.toString()))
@@ -322,9 +301,7 @@ public class HandlingClientBehaviour extends CyclicBehaviour
                     myAgent.send(reply);
 
                     //Clear
-                    msgStringBuilder.delete(0,msgStringBuilder.length());
-                    rowsStringBuilder.delete(0,rowsStringBuilder.length());
-                    columnsStringBuilder.delete(0,columnsStringBuilder.length());
+                    clearValues();
 
                     //Set value from AgentTester
                     valueFromAgentTester = Integer.parseInt(partsMessage[2]);
@@ -376,5 +353,51 @@ public class HandlingClientBehaviour extends CyclicBehaviour
         {
             block();
         }
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public void prepareRowsAndColumns(int x, int y)
+    {
+        for (int k = 0; k < arrayA[0].length; k++)
+        {
+            rowsStringBuilder.append((arrayA[x][k]));
+            if (k != arrayA[0].length - 1)
+            {
+                rowsStringBuilder.append(",");
+            }
+
+        }
+        for (int k = 0; k < arrayB.length; k++)
+        {
+            columnsStringBuilder.append(arrayB[k][y]);
+            if (k != arrayB.length - 1)
+                columnsStringBuilder.append(",");
+        }
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public void clearValues()
+    {
+        msgStringBuilder.delete(0,msgStringBuilder.length());
+        rowsStringBuilder.delete(0,rowsStringBuilder.length());
+        columnsStringBuilder.delete(0,columnsStringBuilder.length());
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public void sendMessage(int x, int y, AID client, int type)
+    {
+        ACLMessage reply = new ACLMessage(type);
+        reply.addReceiver(client);
+        msgStringBuilder.append(x);
+        msgStringBuilder.append(":");
+        msgStringBuilder.append(y);
+        msgStringBuilder.append(":");
+        msgStringBuilder.append(rowsStringBuilder);
+        msgStringBuilder.append(":");
+        reply.setContent(msgStringBuilder.append(columnsStringBuilder).toString());
+        myAgent.send(reply);
     }
 }
