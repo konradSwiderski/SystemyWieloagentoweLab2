@@ -35,7 +35,6 @@ public class CountingAgent extends Agent{
 
     protected void searchServers()
     {
-        System.out.println("SEARCHSERVERS+++++++++++++++++++++++++");
         DFAgentDescription template = new DFAgentDescription();
         ServiceDescription sd = new ServiceDescription();
         sd.setType("Arrays");

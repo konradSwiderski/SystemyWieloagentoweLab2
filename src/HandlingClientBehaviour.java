@@ -2,6 +2,8 @@ import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
+import java.util.Vector;
+
 public class HandlingClientBehaviour extends CyclicBehaviour
 {
     private int[][] arrayA;
@@ -16,6 +18,7 @@ public class HandlingClientBehaviour extends CyclicBehaviour
     private int currentY = 0;
     private int currentX = -1;
     private int numberOfFails = 0;
+    private Vector<String> vectorOfAgents = new Vector<>();
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -42,20 +45,12 @@ public class HandlingClientBehaviour extends CyclicBehaviour
         ACLMessage msg = myAgent.receive();
         if (msg!= null)
         {
+            if(!vectorOfAgents.contains(msg.getSender().toString())) //Add Agent Vector
+                vectorOfAgents.addElement(msg.getSender().toString());
             if(msg.getPerformative() == ACLMessage.REQUEST) //Client is ready
             {
                 if((currentY == arrayC[0].length - 1) && (currentX == arrayC.length - 1)) //ALL ELEMENTS?
                 {
-                    System.out.println("-----");
-                    for(int i = 0; i < arrayC.length; i++)
-                    {
-                        for(int j = 0; j < arrayC[0].length; j++)
-                        {
-                            System.out.print(arrayC[i][j]);
-                            System.out.print(" ");
-                        }
-                        System.out.println();
-                    }
                     //CHECKING PROGRESS ARRAY
                     numberOfFails = 0;
                     outerLoop:
@@ -114,16 +109,19 @@ public class HandlingClientBehaviour extends CyclicBehaviour
                         ACLMessage reply = msg.createReply();
                         reply.setPerformative(ACLMessage.CANCEL);
                         myAgent.send(reply);
-
-//                        for(int i = 0; i < arrayC.length; i++)
-//                        {
-//                            for(int j = 0; j < arrayC[0].length; j++)
-//                            {
-//                                System.out.print(arrayC[i][j]);
-//                                System.out.print(" ");
-//                            }
-//                            System.out.println();
-//                        }
+                        System.out.println("-----arrayC-----");
+                        for(int i = 0; i < arrayC.length; i++)
+                        {
+                            for(int j = 0; j < arrayC[0].length; j++)
+                            {
+                                System.out.print(arrayC[i][j]);
+                                System.out.print(" ");
+                            }
+                            System.out.println();
+                        }
+                        System.out.println("-----vectorOfAgents-----");
+                        for(int i = 0; i < vectorOfAgents.size(); i++)
+                            System.out.println(vectorOfAgents.elementAt(i));
                         System.out.println("the end");
                     }
 

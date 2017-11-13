@@ -27,9 +27,9 @@ public class MaliciousAgent extends CountingAgent {
 //        handlingServerBehaviour.setServer(vectorOfServers.firstElement());
 //        addBehaviour(handlingServerBehaviour);
 //    }
-    protected void searchServers()
-    {
-        super.searchServers();
-    }
+//    protected void searchServers()
+//    {
+//        super.searchServers();
+//    }
 
 }

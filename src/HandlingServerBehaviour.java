@@ -16,7 +16,8 @@ public class HandlingServerBehaviour extends CyclicBehaviour
     private int valueOfArrayC = 0;
     private StringBuilder msgStringBuilder = new StringBuilder("");
     private int failCalucaltion = 0;
-    private int konyTemp = 0;
+    private String agentName;
+    private boolean maliciousAgent = false;
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -29,7 +30,17 @@ public class HandlingServerBehaviour extends CyclicBehaviour
     public void action()
     {
         System.out.println("....................." + myAgent.getName());
-        //IF AGENT 6 TO ZEPSUJ!!!!!!!!!
+        agentName = myAgent.getName();
+        if(agentName.contains("agent6"))
+        {
+            System.out.println("Jestem ten zly");
+            maliciousAgent = true;
+        }
+        else
+        {
+            System.out.println("Jestem ten dobry");
+            maliciousAgent = false;
+        }
         ACLMessage msg = myAgent.receive(); //set pattern and filter to request
         if (msg!= null)
         {
@@ -65,6 +76,8 @@ public class HandlingServerBehaviour extends CyclicBehaviour
                     for (int i = 0; i < rowsString.length; i++)
                         valueOfArrayC = valueOfArrayC + rowsInt.elementAt(i) * columnsInt.elementAt(i);
 
+                    if(maliciousAgent == true) //this if failAgent?
+                        valueOfArrayC = 0;
                     block(ThreadLocalRandom.current().nextInt(1000, 1500 + 1));
 
                     ACLMessage reply = new ACLMessage(ACLMessage.REQUEST);
