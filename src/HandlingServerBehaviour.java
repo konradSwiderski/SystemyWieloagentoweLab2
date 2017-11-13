@@ -135,7 +135,34 @@ public class HandlingServerBehaviour extends CyclicBehaviour
             }
             else if(msg.getPerformative() == ACLMessage.ACCEPT_PROPOSAL) //akceptacja //agentJudge
             {
+                String[] partsMessage = msg.getContent().split(":");
+                currentX = Integer.parseInt(partsMessage[0]);
+                currentY = Integer.parseInt(partsMessage[1]);
+                String[] rowsString = partsMessage[2].split(",");
+                String[] columnsString = partsMessage[3].split(",");
+                for(int i = 0; i < rowsString.length; i++)
+                    rowsInt.addElement(Integer.parseInt(rowsString[i]));
+                for(int i = 0; i < columnsString.length; i++)
+                    columnsInt.addElement(Integer.parseInt(columnsString[i]));
+                for (int i = 0; i < rowsString.length; i++)
+                    valueOfArrayC = valueOfArrayC + rowsInt.elementAt(i) * columnsInt.elementAt(i);
 
+                System.out.println("ACCEPT_PROPOSAL: " + myAgent.getName() + " X " + currentX + " Y " + currentY + " = " + valueOfArrayC);
+
+                ACLMessage reply = new ACLMessage(ACLMessage.ACCEPT_PROPOSAL);
+                reply.addReceiver(server);
+                msgStringBuilder.append(currentX);
+                msgStringBuilder.append(":");
+                msgStringBuilder.append(currentY);
+                msgStringBuilder.append(":");
+                reply.setContent(msgStringBuilder.append(valueOfArrayC).toString());
+                myAgent.send(reply);
+
+                //clear
+                msgStringBuilder.delete(0,msgStringBuilder.length());
+                valueOfArrayC = 0;
+                rowsInt.clear();
+                columnsInt.clear();
             }
         }
         else
