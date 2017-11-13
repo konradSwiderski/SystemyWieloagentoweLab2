@@ -28,6 +28,8 @@ public class HandlingServerBehaviour extends CyclicBehaviour
 
     public void action()
     {
+        System.out.println("....................." + myAgent.getName());
+        //IF AGENT 6 TO ZEPSUJ!!!!!!!!!
         ACLMessage msg = myAgent.receive(); //set pattern and filter to request
         if (msg!= null)
         {

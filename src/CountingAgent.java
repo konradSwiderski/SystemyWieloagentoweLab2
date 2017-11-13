@@ -12,7 +12,7 @@ import java.util.Vector;
 import java.util.concurrent.ThreadLocalRandom;
 public class CountingAgent extends Agent{
 
-    private Vector<AID> vectorOfServers = new Vector<>();
+    protected Vector<AID> vectorOfServers = new Vector<>();
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -20,6 +20,7 @@ public class CountingAgent extends Agent{
     protected void setup()
     {
         super.setup();
+        System.out.println("HAY TO PRAWDZIWY");
         vectorOfServers.clear();
         searchServers();
         while(vectorOfServers.isEmpty()) {searchServers();}
@@ -27,12 +28,14 @@ public class CountingAgent extends Agent{
             HandlingServerBehaviour handlingServerBehaviour = new HandlingServerBehaviour();
             handlingServerBehaviour.setServer(vectorOfServers.firstElement());
             addBehaviour(handlingServerBehaviour);
+
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    private void searchServers()
+    protected void searchServers()
     {
+        System.out.println("SEARCHSERVERS+++++++++++++++++++++++++");
         DFAgentDescription template = new DFAgentDescription();
         ServiceDescription sd = new ServiceDescription();
         sd.setType("Arrays");
