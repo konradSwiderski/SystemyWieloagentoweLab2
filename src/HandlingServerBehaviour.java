@@ -16,6 +16,7 @@ public class HandlingServerBehaviour extends CyclicBehaviour
     private int valueOfArrayC = 0;
     private StringBuilder msgStringBuilder = new StringBuilder("");
     private int failCalucaltion = 0;
+    private int konyTemp = 0;
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -47,6 +48,7 @@ public class HandlingServerBehaviour extends CyclicBehaviour
                 if(failCalucaltion < 3)
                 {
                     System.out.println("_____________FAIL: my posioton " + currentX + currentY );
+
                     ACLMessage reply = new ACLMessage(ACLMessage.FAILURE);
                     reply.addReceiver(server);
                     msgStringBuilder.append(currentX);
@@ -54,6 +56,7 @@ public class HandlingServerBehaviour extends CyclicBehaviour
                     msgStringBuilder.append(currentY);
                     reply.setContent(msgStringBuilder.toString());
                     myAgent.send(reply);
+                    block(2000);
                 }
                 else
                 {
@@ -70,6 +73,7 @@ public class HandlingServerBehaviour extends CyclicBehaviour
                     msgStringBuilder.append(currentY);
                     msgStringBuilder.append(":");
                     reply.setContent(msgStringBuilder.append(valueOfArrayC).toString());
+                    System.out.println("_____________WARTOSC:" + valueOfArrayC);
                     myAgent.send(reply);
                 }
                 //clear

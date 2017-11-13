@@ -47,24 +47,36 @@ public class HandlingClientBehaviour extends CyclicBehaviour
                 if((currentY == arrayC[0].length - 1) && (currentX == arrayC.length - 1)) //ALL ELEMENTS?
                 {
                     System.out.println("-----");
+                    for(int i = 0; i < arrayC.length; i++)
+                    {
+                        for(int j = 0; j < arrayC[0].length; j++)
+                        {
+                            System.out.print(arrayC[i][j]);
+                            System.out.print(" ");
+                        }
+                        System.out.println();
+                    }
                     //CHECKING PROGRESS ARRAY
+                    numberOfFails = 0;
                     outerLoop:
                     for(int i = 0; i < progressArray.length; i++)
                     {
-                        for(int j = 0; j < progressArray.length; j++)
+                        for(int j = 0; j < progressArray[0].length; j++)
                         {
                             System.out.print(progressArray[i][j] + " ");
                             if(progressArray[i][j] != 2)
                             {
                                 numberOfFails++;
                                 System.out.println("WYKRYLEM FAILA: " + j + i);
+                                System.out.print("????????????????????????????????");
+                                System.out.println(arrayB[j][i]);
 
                                 ACLMessage reply = msg.createReply();
                                 reply.setPerformative(ACLMessage.REQUEST);
 
                                 //rows and columns
                                 for (int k = 0; k < arrayA[0].length; k++) {
-                                    rowsStringBuilder.append((arrayA[j][k]));
+                                    rowsStringBuilder.append((arrayA[i][k]));
                                     if (k != arrayA[0].length - 1) {
                                         rowsStringBuilder.append(",");
                                     }
@@ -74,7 +86,7 @@ public class HandlingClientBehaviour extends CyclicBehaviour
                                 System.out.println(rowsStringBuilder);
 
                                 for (int k = 0; k < arrayB.length; k++) {
-                                    columnsStringBuilder.append(arrayB[k][i]);
+                                    columnsStringBuilder.append(arrayB[k][j]);
                                     if (k != arrayB.length - 1)
                                         columnsStringBuilder.append(",");
                                 }
@@ -103,15 +115,15 @@ public class HandlingClientBehaviour extends CyclicBehaviour
                         reply.setPerformative(ACLMessage.CANCEL);
                         myAgent.send(reply);
 
-                        for(int i = 0; i < arrayC.length; i++)
-                        {
-                            for(int j = 0; j < arrayC[0].length; j++)
-                            {
-                                System.out.print(arrayC[i][j]);
-                                System.out.print(" ");
-                            }
-                            System.out.println();
-                        }
+//                        for(int i = 0; i < arrayC.length; i++)
+//                        {
+//                            for(int j = 0; j < arrayC[0].length; j++)
+//                            {
+//                                System.out.print(arrayC[i][j]);
+//                                System.out.print(" ");
+//                            }
+//                            System.out.println();
+//                        }
                         System.out.println("the end");
                     }
 
@@ -162,6 +174,7 @@ public class HandlingClientBehaviour extends CyclicBehaviour
             }
             else if(msg.getPerformative() == ACLMessage.CONFIRM) //Get value of ArrayC
             {
+                //potwierdzenie
                 String[] partsMessage = msg.getContent().split(":");
                 int tempX = Integer.parseInt(partsMessage[0]);
                 int tempY = Integer.parseInt(partsMessage[1]);
@@ -172,10 +185,13 @@ public class HandlingClientBehaviour extends CyclicBehaviour
             else if(msg.getPerformative() == ACLMessage.FAILURE)
             {
                 System.out.println("Serwer odebral FAILA " + msg.getContent());
-//                String[] partsMessage = msg.getContent().split(":");
-//                int tempX = Integer.parseInt(partsMessage[0]);
-//                int tempY= Integer.parseInt(partsMessage[1]);
+                String[] partsMessage = msg.getContent().split(":");
+                int tempX = Integer.parseInt(partsMessage[0]);
+                int tempY= Integer.parseInt(partsMessage[1]);
+
 //                progressArray[tempY][tempX] = 0;
+                System.out.print(">>>>>>>>>>>>>>>>>>>>>>>>>>.");
+                System.out.println(arrayB[tempX][tempY]);
             }
         }
         else
