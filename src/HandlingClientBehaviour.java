@@ -289,7 +289,7 @@ public class HandlingClientBehaviour extends CyclicBehaviour
                 System.out.println("Serwer odebral FAILA " + msg.getContent());
                 String[] partsMessage = msg.getContent().split(":");
                 int tempX = Integer.parseInt(partsMessage[0]);
-                int tempY= Integer.parseInt(partsMessage[1]);
+                int tempY = Integer.parseInt(partsMessage[1]);
 
                 progressArray[tempY][tempX] = -1;
                 System.out.print(">>>>>>>>>>>>>>>>>>>>>>>>>>.");
